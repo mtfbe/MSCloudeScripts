@@ -1,4 +1,4 @@
-﻿# Requires -Version 3
+# Requires -Version 3
 <#
 .SYNOPSIS
     Creates a scheduled task to implement folder redirection for .
@@ -6,6 +6,7 @@
 .NOTES
     Name: Redirect-Folders.ps1
     Author: Aaron Parker
+    Edited by Marc Gehri, MTF Thoerishaus AG
     Site: https://stealthpuppy.com
     Twitter: @stealthpuppy
 #>
@@ -26,7 +27,22 @@ Param (
     [Parameter()]$Arguments = "$Target\$ScriptVb /b /nologo",
     [Parameter()]$VerbosePreference = "Continue"
 )
-Start-Transcript -Path $LogFile
+
+$LogName = "OneDriveFolderRedirection"
+$Date = Get-Date -Format "yyyy-MM-dd--HH-mm-ss"
+$Target = "$env:LOCALAPPDATA\" + $LogName
+
+# Falls das log schon existiert, muss nichts mehr migriert werden, daher exit
+If(Test-Path -Path $Target){
+Exit
+}
+
+# log anlegen
+New-Item $Target -ItemType directory
+Start-Transcript -Path ($Target + "\" + $Date + ".log")
+
+############################################################################################################
+
 
 Function Set-KnownFolderPath {
     <#
